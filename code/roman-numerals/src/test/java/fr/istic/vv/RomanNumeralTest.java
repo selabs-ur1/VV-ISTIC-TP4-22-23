@@ -1,12 +1,13 @@
 package fr.istic.vv;
+
 import net.jqwik.api.*;
-import net.jqwik.api.constraints.CharsList;
 import net.jqwik.api.constraints.IntRange;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class RomanNumeralTest {
     private static final List<Character> allowedCharacters = new ArrayList<>(Arrays.asList('M', 'D', 'C', 'L','X', 'V', 'I'));
@@ -53,8 +54,18 @@ public class RomanNumeralTest {
     }
 
     @Property
-    boolean checkLeftLowRightHigh(@ForAll("leftLowRightHigh") String lowHigh) {
+    boolean checkLeftLowRightHighGood(@ForAll("leftLowRightHighGood") String lowHigh) {
         return RomanNumeraUtils.parseRomanNumeral(lowHigh) < romanValues.get(lowHigh.charAt(1));
+    }
+
+    @Property
+    boolean checkLeftLowRightHighBad(@ForAll("leftLowRightHighBad") String lowHigh) {
+         try {
+             RomanNumeraUtils.parseRomanNumeral(lowHigh);
+         } catch (ArithmeticException e) {
+             return true;
+         }
+         return false;
     }
 
     @Provide
@@ -83,13 +94,25 @@ public class RomanNumeralTest {
     }
 
     @Provide
-    Arbitrary<String> leftLowRightHigh() {
+    Arbitrary<String> leftLowRightHighGood() {
         List<Character> highs = new ArrayList<>(allowedCharacters);
-        highs.remove(highs.size() - 1);
+        highs = highs.subList(0, highs.size() - 3);
+
+        Character high = Arbitraries.of(highs).sample();
+        List<Character> lowChars = allowedCharacters.stream().filter(c ->
+                romanValues.get(c) * 5 == romanValues.get(high) || romanValues.get(c) * 10 == romanValues.get(high)
+        ).collect(Collectors.toList());
+        return Arbitraries.of(lowChars).map(low -> "" + low + high);
+    }
+
+    @Provide
+    Arbitrary<String> leftLowRightHighBad() {
+        List<Character> highs = new ArrayList<>(allowedCharacters);
+        highs = highs.subList(0, highs.size() - 4);
 
         Character high = Arbitraries.of(highs).sample();
         List<Character> lowChars = allowedCharacters.subList(
-                allowedCharacters.indexOf(high) + 1, allowedCharacters.size() - 1);
+                allowedCharacters.indexOf(high) + 3, allowedCharacters.size() -1);
         return Arbitraries.of(lowChars).map(low -> "" + low + high);
     }
 

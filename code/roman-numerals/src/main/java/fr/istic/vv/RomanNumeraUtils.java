@@ -103,6 +103,9 @@ public class RomanNumeraUtils {
                                 if (values2 > values1) {
                                         result = result + sum2 + sum1;
                                 } else if (values2 < values1) {
+                                        if (!(sum2 * 5 == sum1 || sum2 * 10 == sum1)) {
+                                                throw new ArithmeticException("The subtracted symbol must be one fifth or one tenth of the larger.");
+                                        }
                                         result = result + sum1 - sum2;
                                 }
 
