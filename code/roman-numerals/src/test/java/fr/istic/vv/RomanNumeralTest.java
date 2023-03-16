@@ -68,6 +68,16 @@ public class RomanNumeralTest {
          return false;
     }
 
+    @Property
+    boolean checkToRoman(@ForAll("numbersBelow3890") int numbers) {
+        String romanValue = RomanNumeraUtils.toRomanNumeral(numbers);
+        boolean isValid = RomanNumeraUtils.isValidRomanNumeral(romanValue);
+
+        if (!isValid) System.out.println(romanValue + " : " + numbers);
+
+        return isValid;
+    }
+
     @Provide
     Arbitrary<Character> invalidChars() {
         return Arbitraries.chars().filter(c -> !allowedCharacters.contains(c));
@@ -114,6 +124,11 @@ public class RomanNumeralTest {
         List<Character> lowChars = allowedCharacters.subList(
                 allowedCharacters.indexOf(high) + 3, allowedCharacters.size() -1);
         return Arbitraries.of(lowChars).map(low -> "" + low + high);
+    }
+
+    @Provide
+    Arbitrary<Integer> numbersBelow3890() {
+        return Arbitraries.integers().between(0, 3889);
     }
 
 }
