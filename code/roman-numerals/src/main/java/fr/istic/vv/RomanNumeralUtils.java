@@ -1,8 +1,12 @@
 package fr.istic.vv;
 
-public class RomanNumeraUtils {
+import java.util.HashMap;
+import java.util.Map;
 
-        private static final Map<Character, Integer> ROMAN_NUMERAL_VALUES = new HashMap<Character, Integer>() {{
+public class RomanNumeralUtils {
+
+        private static final Map<Character, Integer> ROMAN_VALUES =
+                new HashMap<Character, Integer>() {{
                 put('I', 1);
                 put('V', 5);
                 put('X', 10);
@@ -18,11 +22,13 @@ public class RomanNumeraUtils {
          * @return
          */
         public static boolean isValidRomanNumeral(String value) {
+
                 if (value == null || value.isEmpty()) {
                         return false;
                 }
+
                 for (char c : value.toCharArray()) {
-                        if (!ROMAN_NUMERAL_VALUES.containsKey(c)) {
+                        if (!ROMAN_VALUES.containsKey(c)) {
                                 return false;
                         }
                 }
@@ -35,42 +41,42 @@ public class RomanNumeraUtils {
          * @return
          */
         public static int parseRomanNumeral(String numeral) {
+                int resultat = 0;
+                int lastValue = 0;
                 if (!isValidRomanNumeral(numeral)) {
                         throw new IllegalArgumentException("Invalid Roman numeral: " + numeral);
                 }
-                int result = 0;
-                int lastValue = 0;
                 for (int i = numeral.length() - 1; i >= 0; i--) {
-                        int currentValue = ROMAN_NUMERAL_VALUES.get(numeral.charAt(i));
+                        int currentValue = ROMAN_VALUES.get(numeral.charAt(i));
                         if (currentValue >= lastValue) {
-                                result += currentValue;
+                                resultat += currentValue;
                         } else {
-                                result -= currentValue;
+                                resultat -= currentValue;
                         }
                         lastValue = currentValue;
                 }
-                return result;
+                return resultat;
         }
 
         /**
-         *
+         * Converti de numeral à roman
          * @param number
          * @return
          */
         public static String toRomanNumeral(int number) {
+                StringBuilder resultat = new StringBuilder();
+                int[] values = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
                 if (number < 1 || number > 3999) {
                         throw new IllegalArgumentException("Number out of range: " + number);
                 }
-                StringBuilder result = new StringBuilder();
-                int[] values = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
                 String[] symbols = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
                 for (int i = 0; i < values.length; i++) {
                         while (number >= values[i]) {
-                                result.append(symbols[i]);
+                                resultat.append(symbols[i]);
                                 number -= values[i];
                         }
                 }
-                return result.toString();
+                return resultat.toString();
         }
     
 }

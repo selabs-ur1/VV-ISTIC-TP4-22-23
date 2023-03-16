@@ -1,31 +1,29 @@
 package fr.istic.vv;
+
+import fr.istic.vv.RomanNumeralUtils;
 import net.jqwik.api.*;
-import net.jqwik.api.constraints.IntRange;
+import static org.junit.jupiter.api.Assertions.*;
 
+class RomanNumeralTest {
 
-public class RomanNumeralTest {
     @Property
-    boolean absoluteValueOfAllNumbersIsPositive(@ForAll int anInteger) {
-        return Math.abs(anInteger) >= 0;
+    void testParseRomanNumeral(@ForAll("validRomanNumerals") String numeral, @ForAll("validRomanNumeralValues") int value) {
+        assertEquals(value, RomanNumeralUtils.parseRomanNumeral(numeral));
     }
 
     @Property
-    void toRomanNumeralShouldProduceValidRomanNumeral(@ForAll @IntRange(min=0, max=3999) int number) {
-        String romanNumeral = RomanNumeraUtils.toRomanNumeral(number);
-        assertThat(RomanNumeraUtils.isValidRomanNumeral(romanNumeral)).isTrue();
-    }
-
-    @Property
-    void parseRomanNumeralShouldInverseToRomanNumeral(@ForAll("romanNumeral") String romanNumeral) {
-        int number = RomanNumeraUtils.parseRomanNumeral(romanNumeral);
-        assertThat(RomanNumeraUtils.toRomanNumeral(number)).isEqualTo(romanNumeral);
+    void testToRomanNumeral(@ForAll("validRomanNumeralValues") int value, @ForAll("validRomanNumerals") String numeral) {
+        assertEquals(numeral, RomanNumeralUtils.toRomanNumeral(value));
     }
 
     @Provide
-    Arbitrary<String> romanNumeral() {
-        return Arbitraries.strings()
-                .withCharRange('I', 'I').andChars('V', 'X', 'L', 'C', 'D', 'M')
-                .ofMinLength(1).ofMaxLength(15)
-                .injectDuplicates(0.2);
+    Arbitrary<String> validRomanNumerals() {
+        return Arbitraries.strings().withCharRange('I', 'M').ofMaxLength(15).filter(RomanNumeralUtils::isValidRomanNumeral);
     }
+
+    @Provide
+    Arbitrary<Integer> validRomanNumeralValues() {
+        return Arbitraries.integers().between(1, 3999);
+    }
+
 }
