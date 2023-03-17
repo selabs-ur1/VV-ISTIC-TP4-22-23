@@ -1,3 +1,5 @@
+# Sindbad LOUIS et Brett BECKER
+
 # Validation and Verification: Practical Session
 
 This practical session will help to better understand property-based testing, and in particular the tool [jqwik](https://jqwik.net/).
