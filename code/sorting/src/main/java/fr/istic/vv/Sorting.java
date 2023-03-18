@@ -25,7 +25,7 @@ public class Sorting {
 
 
     public static <T> T[] quicksort(T[] array, Comparator<T> comparator)  {
-        return quicksortHelper(array, 0, array.length, comparator);
+        return quicksortHelper(array, 0, array.length - 1, comparator);
     }
 
     private static <T> T[] quicksortHelper(T[] array, int begin, int end, Comparator<T> comparator) {
@@ -38,12 +38,16 @@ public class Sorting {
     }
 
     private static <T> int partition(T[] array, int begin, int end, Comparator<T> comparator) {
-        T pivot = array[(begin + end) / 2];
+        T pivot = array[(end - begin) / 2 + begin];
         int i = begin - 1;
         int j = end + 1;
         while (true) {
-            while (comparator.compare(array[i], pivot) < 0) i ++;
-            while (comparator.compare(array[j], pivot) > 0) j --;
+            do {
+                i ++;
+            } while (comparator.compare(array[i], pivot) < 0) ;
+            do {
+                j --;
+            } while (comparator.compare(array[j], pivot) > 0) ;
             if (i >= j) return j;
 
             T tmp = array[i];
@@ -65,7 +69,7 @@ public class Sorting {
         return array;
     }
 
-    static <T> void merge(T[] src, T[] left, T[] right, Comparator<T> comparator) {
+    private static <T> void merge(T[] src, T[] left, T[] right, Comparator<T> comparator) {
         var leftPos = 0;
         var rightPos = 0;
         var mainPos = 0;
