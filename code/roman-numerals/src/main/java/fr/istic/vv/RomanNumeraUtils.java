@@ -21,13 +21,62 @@ public class RomanNumeraUtils {
     private static String[] tpos0 = { "",  "I",  "II",  "III",  "IV",
             "V", "VI", "VII", "VIII", "IX" };
 
+    private static char[] chars = { 'M', 'D', 'C', 'L', 'X', 'V', 'I' };
+
+    private static boolean isLower(char of, char by) {
+        int containsFirst = -1;
+        int containsSecond = -1;
+        for (var i = 0; i < chars.length; i++) {
+            if (chars[i] == of) containsFirst = i;
+            if (chars[i] == by) containsSecond = i;
+        }
+        if (containsFirst != -1 && containsSecond != -1) {
+            return containsFirst < containsSecond;
+        } else {
+            throw new IllegalStateException("Illegal char detected");
+        }
+    }
+
     public static boolean isValidRomanNumeral(String value) {
+        char sinceLast = ' ';
+        int sinceLastCount = 0;
         for (var i = 0; i < value.length(); i++) {
             if ("MDCLXVI".contains(""+value.charAt(i))) {
-                return true;
+                // Repeating roles
+                if (value.charAt(i) != sinceLast) {
+                    sinceLast = value.charAt(i);
+                    sinceLastCount = 1;
+                } else {
+                    if ("DLV".contains("" + sinceLast)) {
+                        return false;
+                    }
+                    sinceLastCount ++;
+                }
+                if (sinceLastCount > 3) {
+                    return false;
+                }
+                // Substraction roles
+                {
+                    // Skip if first
+                    if (i == 0) {
+                        continue;
+                    }
+
+                    var lastCh = value.charAt(i - 1);
+                    var curr = value.charAt(i);
+
+                    if (isLower(lastCh, curr)) {
+                        if ("CXV".contains("" + lastCh)) {
+                            continue;
+                        } else {
+                            return false;
+                        }
+                    }
+                }
             }
         }
         return false;
+
     }
 
     public static int parseRomanNumeral(String numeral) {
@@ -42,7 +91,8 @@ public class RomanNumeraUtils {
             }
 
             if (current < next) {
-                result += next - current;
+                result += (next - current);
+                i ++;
             } else {
                 result += current;
             }
@@ -56,6 +106,9 @@ public class RomanNumeraUtils {
     }
 
     public static String toRomanNumeral(int number) {
+        if (number < 0 || number > 3999) {
+            throw new IllegalStateException("Out of bound!");
+        }
         var pos3 = tpos3[number / 1000];
         number %= 1000;
         var pos2 = tpos2[number / 100];
@@ -67,4 +120,11 @@ public class RomanNumeraUtils {
         return "" + pos3 + pos2 + pos1 + pos0;
     }
 
+    public static void main(String[] args) {
+        System.out.println(RomanNumeraUtils.isValidRomanNumeral("M"));
+        System.out.println(RomanNumeraUtils.parseRomanNumeral("M"));
+        System.out.println(RomanNumeraUtils.toRomanNumeral(1000));
+
+        System.out.println(RomanNumeraUtils.toRomanNumeral(RomanNumeraUtils.parseRomanNumeral("M")));
+    }
 }
